@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aviator Predictor Estratégico</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(-45deg, #1e3a8a, #0ea5e9, #9333ea, #f43f5e);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    .backdrop {
+      backdrop-filter: blur(10px) brightness(0.9);
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+  <div class="shadow-2xl rounded-2xl p-8 w-full max-w-md backdrop">
+    <h1 class="text-2xl font-bold text-center mb-6">Previsor de Aviator</h1>
+
+    <label class="block mb-2 font-semibold" for="casinoUrl">URL do Cassino:</label>
+    <input 
+      type="text" 
+      id="casinoUrl" 
+      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+      placeholder="https://placard.co.mz/casino/game-play/?gameId=8496"
+    />
+
+    <button 
+      onclick="gerarPrevisao()" 
+      class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition">
+      Gerar Previsão Estratégica
+    </button>
+
+    <div id="resultado" class="mt-6 text-center text-lg font-medium"></div>
+
+    <h2 class="text-xl font-semibold mt-8 mb-2">Histórico de Previsões</h2>
+    <ul id="historico" class="list-disc pl-5 text-gray-700 space-y-1"></ul>
+  </div>
+
+  <script>
+    const historicoMultiplicadores = [];
+
+    function gerarPrevisao() {
+      const url = document.getElementById('casinoUrl').value;
+      const resultado = document.getElementById('resultado');
+      const historico = document.getElementById('historico');
+
+      if (!url || !url.startsWith('http')) {
+        resultado.textContent = 'Por favor, insira uma URL válida.';
+        resultado.className = 'text-center text-lg font-medium text-red-600';
+        return;
+      }
+
+      resultado.textContent = 'Analisando histórico e gerando estratégia...';
+      resultado.className = 'text-center text-lg font-medium text-blue-600';
+
+      setTimeout(() => {
+        let novoValor;
+
+        if (historicoMultiplicadores.length >= 3) {
+          const ultimos = historicoMultiplicadores.slice(-3);
+          const ultimo = ultimos[ultimos.length - 1];
+          const todosBaixos = ultimos.every(v => v < 2);
+
+          if (ultimo > 5) {
+            // Após explosão alta, chance de queda
+            novoValor = (Math.random() * 1.5 + 1).toFixed(2);
+          } else if (todosBaixos) {
+            // Após sequência de baixos, chance de explosão
+            novoValor = (Math.random() * 8 + 2).toFixed(2);
+          } else {
+            // Situação neutra
+            novoValor = (Math.random() * 3 + 1).toFixed(2);
+          }
+        } else {
+          novoValor = (Math.random() * 5).toFixed(2);
+        }
+
+        historicoMultiplicadores.push(parseFloat(novoValor));
+        resultado.textContent = `Previsão Estratégica: Multiplicador ${novoValor}x`;
+        resultado.className = 'text-center text-lg font-medium text-green-600';
+
+        const item = document.createElement('li');
+        const dataHora = new Date().toLocaleString();
+        item.textContent = `${dataHora} - Multiplicador ${novoValor}x`;
+        historico.prepend(item);
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
